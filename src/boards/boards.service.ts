@@ -10,11 +10,11 @@ export class BoardsService {
     private readonly prisma: PrismaService
   ) { }
 
-  async getBoards() {
+  async getBoards(): Promise<Boards[]> {
     return this.prisma.boards.findMany();
   }
 
-  async getBoardById(id: number) {
+  async getBoardById(id: number): Promise<Boards> {
     return this.prisma.boards.findUnique({
       where: {
         id,
@@ -22,13 +22,24 @@ export class BoardsService {
     });
   }
 
-  async createBoard(createBoardDto: CreateBoardDto) {
+  getBoardsByPage(pageNumber: number): Promise<Boards[]> {
+    const take = 5;
+    return this.prisma.boards.findMany({
+      skip: (pageNumber - 1) * take,
+      take,
+      orderBy: {
+        created: 'desc',
+      },
+    });
+  }
+
+  async createBoard(createBoardDto: CreateBoardDto): Promise<Boards> {
     return this.prisma.boards.create({
       data: createBoardDto,
     });
   }
 
-  async updateBoard(id: number, updateBoardDto: Partial<Boards>) {
+  async updateBoard(id: number, updateBoardDto: Partial<Boards>): Promise<Boards> {
     return this.prisma.boards.update({
       where: {
         id,
@@ -37,7 +48,7 @@ export class BoardsService {
     });
   }
 
-  async deleteBoard(id: number) {
+  async deleteBoard(id: number): Promise<Boards> {
     return this.prisma.boards.delete({
       where: {
         id,
